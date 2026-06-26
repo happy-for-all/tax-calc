@@ -661,7 +661,7 @@ kenpo_rates: {
   okayama:10.05, hiroshima:9.78, yamaguchi:10.15, tokushima:10.24,
   kagawa:10.02, ehime:9.98, kochi:10.05, fukuoka:10.11,
   saga:10.55, nagasaki:10.06, kumamoto:10.08, oita:10.08,
-  miyazaki:10.21, kagoshima:10.08, okinawa:9.40,
+  miyazaki:9.77, kagoshima:10.13, okinawa:9.44,
 },
   // 国民健康保険料：所得割率・均等割
   nhi_rates: {
@@ -785,7 +785,7 @@ function calcEmployee(pref, age, dep) {
   const salary = (parseInt(document.getElementById('salary').value) || 500) * 10000;
   const bonus  = (parseInt(document.getElementById('bonus').value)  || 0)   * 10000;
   const total_salary = salary + bonus;
-
+  // 給与所得控除は月給+賞与の年収合計に対して計算
   const kyuyo_deduction = calcGivenDeduction(total_salary);
   const kyuyo_shotoku   = Math.max(0, total_salary - kyuyo_deduction);
 
