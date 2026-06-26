@@ -227,7 +227,6 @@
       border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px;
       margin-bottom: 20px;
     }
-    .footer-links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; margin-bottom: 16px; }
     .footer-copy { font-size: 12px; color: var(--text-m); }
 
     /* ===== ユーティリティ ===== */
@@ -251,7 +250,7 @@
 <header>
   <div class="wrap header-inner">
     <div class="logo">💰 <span>おかね</span>見える化ラボ</div>
-    <div class="header-badge">令和7年度対応</div>
+    <div class="header-badge">令和8年度対応</div>
   </div>
 </header>
 
@@ -263,7 +262,7 @@
     <div class="hero-badges">
       <span class="hero-badge">✅ 無料・登録不要</span>
       <span class="hero-badge">✅ 個人情報保存なし</span>
-      <span class="hero-badge">✅ 令和7年度最新対応</span>
+      <span class="hero-badge">✅ 令和8年度最新対応</span>
     </div>
   </div>
 </section>
@@ -496,9 +495,9 @@
       </div>
 
       <!-- メタ情報 -->
-      <div class="meta-info">
-        対応年度：令和7年度（2025年度）｜
-        データ最終更新：2025年4月｜
+      <div class="meta-info" id="calc-conditions">
+        対応年度：令和8年度（2026年度）｜
+        データ最終更新：2026年6月｜
         参照：国税庁・厚生労働省・各都道府県公表情報｜
         ※計算は目安です。生命保険料控除等の個別事情により実際と異なる場合があります。
       </div>
@@ -543,7 +542,7 @@
           Q. 計算結果はどの程度正確ですか？
         </summary>
         <p style="font-size:13px; color:var(--text-s); margin-top:10px; line-height:1.8;">
-          令和7年度（2025年度）の最新税率・保険料率に基づき計算しています。協会けんぽの健康保険料率は47都道府県別に対応、国民健康保険料も都道府県の代表市区町村の料率を使用しています。ただし、生命保険料控除・医療費控除・住宅ローン控除など個人固有の控除は反映されないため、あくまでも目安としてご活用ください。
+          令和8年度（2026年度）の最新税率・保険料率に基づき計算しています。協会けんぽの健康保険料率は47都道府県別に対応、国民健康保険料も都道府県の代表市区町村の料率を使用しています。ただし、生命保険料控除・医療費控除・住宅ローン控除など個人固有の控除は反映されないため、あくまでも目安としてご活用ください。
         </p>
       </details>
       <details style="border:1px solid var(--border); border-radius:10px; padding:14px 18px;">
@@ -607,7 +606,7 @@
     </div>
 
     <p style="font-size:13px; color:var(--text-m); line-height:1.8; margin-top:16px;">
-      ※ 本ページの情報は令和7年度時点のものです。税制は毎年改正されることがあります。最新情報は
+      ※ 本ページの情報は令和8年度時点のものです。税制は毎年改正されることがあります。最新情報は
       <a href="https://www.nta.go.jp/" target="_blank" rel="noopener">国税庁</a>・
       <a href="https://www.mhlw.go.jp/" target="_blank" rel="noopener">厚生労働省</a>・
       各自治体の公式サイトをご確認ください。
@@ -621,13 +620,9 @@
   <div class="wrap">
     <div class="footer-disclaimer">
       <strong>【免責事項】</strong>
-      本シミュレーターは令和7年度の最新法令に基づき、極めて高い精度で計算を行っておりますが、生命保険料控除・医療費控除・障害者控除など個人固有の事情により、実際の税額・保険料と異なる場合があります。計算結果はあくまでも目安としてご活用いただき、最終的な税額・保険料については税理士・社会保険労務士または各自治体・税務署にご確認ください。本ツールの利用によって生じた損害について、当サイトは一切の責任を負いかねます。
+      本シミュレーターは令和8年度の最新法令に基づき、極めて高い精度で計算を行っておりますが、生命保険料控除・医療費控除・障害者控除など個人固有の事情により、実際の税額・保険料と異なる場合があります。計算結果はあくまでも目安としてご活用いただき、最終的な税額・保険料については税理士・社会保険労務士または各自治体・税務署にご確認ください。本ツールの利用によって生じた損害について、当サイトは一切の責任を負いかねます。なお、本サイトはGoogle Analyticsを使用してアクセス解析を行っています。Google Analyticsはクッキーを使用しますが、個人を特定する情報は収集しません。
     </div>
-    <div class="footer-links">
-      <a href="#">プライバシーポリシー</a>
-      <a href="#">お問い合わせ</a>
-    </div>
-    <div class="footer-copy">© 2025 おかね見える化ラボ ／ Happy for All（HFA）プロジェクト</div>
+    <div class="footer-copy">© 2026 おかね見える化ラボ ／ Happy for All（HFA）プロジェクト</div>
   </div>
 </footer>
 
@@ -640,9 +635,9 @@
    ※ Phase2でJSONファイルに分離予定
    ============================================================ */
 const TAX_MASTER = {
-  year: 2025,
+  year: 2026,
   basic_deduction: 480000,          // 基礎控除
-  national_pension_monthly: 17510,  // 国民年金（令和7年度：17,510円に修正）
+  national_pension_monthly: 17620,  // 国民年金（令和8年度：17,620円に修正）
   income_tax_brackets: [
     { limit:  1950000, rate: 0.05, deduction:       0 },
     { limit:  3300000, rate: 0.10, deduction:   97500 },
@@ -652,21 +647,22 @@ const TAX_MASTER = {
     { limit: 40000000, rate: 0.40, deduction: 2796000 },
     { limit: Infinity,  rate: 0.45, deduction: 4796000 },
   ],
-  // 協会けんぽ 都道府県別 健康保険料率（令和7年3月〜）
-  kenpo_rates: {
-    hokkaido:10.21, aomori:9.49, iwate:9.61, miyagi:10.04,
-    akita:10.09, yamagata:9.84, fukushima:9.53, ibaraki:9.73,
-    tochigi:9.75, gunma:9.58, saitama:9.80, chiba:9.68,
-    tokyo:9.98, kanagawa:9.98, niigata:9.35, toyama:9.57,
-    ishikawa:9.66, fukui:9.82, yamanashi:9.67, nagano:9.51,
-    gifu:9.91, shizuoka:9.72, aichi:9.92, mie:9.81,
-    shiga:9.75, kyoto:10.02, osaka:10.34, hyogo:10.18,
-    nara:9.80, wakayama:9.96, tottori:9.68, shimane:9.80,
-    okayama:10.03, hiroshima:9.96, yamaguchi:9.82, tokushima:10.05,
-    kagawa:10.23, ehime:10.04, kochi:9.94, fukuoka:10.36,
-    saga:10.46, nagasaki:9.92, kumamoto:10.00, oita:9.97,
-    miyazaki:9.84, kagoshima:10.01, okinawa:9.67,
-  },
+  // 変更後（令和8年3月分〜 協会けんぽ公式サイトより）
+// 協会けんぽ 都道府県別 健康保険料率（令和8年3月〜）
+kenpo_rates: {
+  hokkaido:10.28, aomori:9.85, iwate:9.51, miyagi:10.10,
+  akita:10.01, yamagata:9.75, fukushima:9.50, ibaraki:9.52,
+  tochigi:9.82, gunma:9.68, saitama:9.67, chiba:9.73,
+  tokyo:9.85, kanagawa:9.92, niigata:9.21, toyama:9.59,
+  ishikawa:9.70, fukui:9.71, yamanashi:9.55, nagano:9.63,
+  gifu:9.80, shizuoka:9.61, aichi:9.93, mie:9.77,
+  shiga:9.88, kyoto:9.89, osaka:10.13, hyogo:10.12,
+  nara:9.91, wakayama:10.06, tottori:9.86, shimane:9.94,
+  okayama:10.05, hiroshima:9.78, yamaguchi:10.15, tokushima:10.24,
+  kagawa:10.02, ehime:9.98, kochi:10.05, fukuoka:10.11,
+  saga:10.55, nagasaki:10.06, kumamoto:10.08, oita:10.08,
+  miyazaki:10.21, kagoshima:10.08, okinawa:9.40,
+},
   // 国民健康保険料：所得割率・均等割
   nhi_rates: {
     hokkaido:{ir:0.0767,pc:44000}, aomori:{ir:0.0810,pc:39000},
@@ -694,9 +690,12 @@ const TAX_MASTER = {
     miyazaki:{ir:0.0770,pc:40000}, kagoshima:{ir:0.0790,pc:40000},
     okinawa:{ir:0.0800,pc:40000},
   },
-  kaigo_rate: 0.0182,
+  kaigo_rate: 0.0162,
   kousei_nenkin_rate: 0.0915,
-  koyou_hoken_rate: 0.006,
+  // 変更後（定数を追加・会社員の計算に反映）
+koyou_hoken_rate: 0.006,
+// 子ども・子育て支援金（2026年4月分給与＝5月納付分〜）労使折半・本人負担
+kodomo_shien_rate: 0.00115,  // 0.23%÷2=0.115%（本人負担分）
 };
 
 /* ============================================================
@@ -805,7 +804,10 @@ function calcEmployee(pref, age, dep) {
   const bonus_nenkin   = Math.floor(kenpo_bonus_capped  * TAX_MASTER.kousei_nenkin_rate);
   const nenkin = nenkin_monthly + bonus_nenkin;
   const koyou  = Math.floor(total_salary * TAX_MASTER.koyou_hoken_rate);
-  const social_total = kenpo + kaigo + nenkin + koyou;
+// 子ども・子育て支援金（令和8年4月分給与〜）標準報酬月額に対して健保と同じ上限
+const kodomo = Math.floor(kenpo_capped * TAX_MASTER.kodomo_shien_rate) * 12
+             + Math.floor(kenpo_bonus_capped * TAX_MASTER.kodomo_shien_rate);
+const social_total = kenpo + kaigo + nenkin + koyou + kodomo;
 
   const taxable = Math.max(0,
     kyuyo_shotoku
@@ -823,7 +825,7 @@ function calcEmployee(pref, age, dep) {
     take_home,
     kyuyo_deduction,
     kyuyo_shotoku,
-    social: { kenpo, kaigo, nenkin, koyou, total: social_total },
+    social: { kenpo, kaigo, nenkin, koyou, kodomo, total: social_total },
     income_tax,
     residence_tax,
     tax_total:      income_tax + residence_tax,
@@ -881,7 +883,7 @@ function calcSelf(pref, age, dep) {
     gross: revenue, expense, jigyo_shotoku,
     take_home: Math.max(0, take_home),
     blue_ded, ideco_amount,
-    social: { nhi: nhi_total, nenkin, total: social_total },
+    social: { nhi: nhi_total, nenkin, kodomo: 0, total: social_total },
     income_tax, residence_tax,
     tax_total:       income_tax + residence_tax,
     total_deducted,
@@ -912,7 +914,7 @@ function renderResult(r, tab) {
     const marginal = getMarginalRate(r.taxable) + 0.10;
     const ideco_saving = Math.floor(23000 * 12 * marginal);
     document.getElementById('loss-amount').textContent =
-      `iDeCoに未加入の場合、年間 約${fmtMan(ideco_saving)} 節税できる可能性があります！`;
+      `iDeCoに未加入の場合、月2.3万円拠出時で年間 約${fmtMan(ideco_saving)} 節税できる可能性があります（試算）！`;
     document.getElementById('loss-desc').textContent =
       'iDeCo（個人型確定拠出年金）は全額所得控除。今すぐ始めるだけで税負担が減ります。';
     lossBanner.style.display = '';
@@ -928,6 +930,7 @@ function renderResult(r, tab) {
         r.social.kaigo > 0 ? ['介護保険料',     -r.social.kaigo,  'red'] : null,
         ['厚生年金保険料',        -r.social.nenkin,  'red'],
         ['雇用保険料',            -r.social.koyou,   'red'],
+r.social.kodomo > 0 ? ['子ども・子育て支援金', -r.social.kodomo, 'red'] : null,
         ['所得税（復興税込）',    -r.income_tax,     'red'],
         ['住民税',                -r.residence_tax,  'red'],
         ['手取り合計',            r.take_home,       'green total'],
@@ -982,6 +985,22 @@ function renderResult(r, tab) {
       </div>
     </div>`).join('');
 
+  // 👑 修正：計算条件のメタ情報を動的に生成して表示（都道府県を日本語で抽出）
+  const condEl = document.getElementById('calc-conditions');
+  if (condEl) {
+    const prefSelect = document.getElementById('pref');
+    const prefName = prefSelect.options[prefSelect.selectedIndex].text;
+    const kenpoLabel = tab === 'employee' ? `協会けんぽ（${prefName}）` : '国民健康保険';
+    const kaigoLabel = r.age >= 40 && r.age < 65 ? '・介護保険あり' : '';
+    const depLabel   = r.dep > 0 ? `・扶養${r.dep}人` : '・扶養なし';
+    
+    condEl.innerHTML =
+      `対応年度：令和8年度（2026年度）｜データ最終更新：2026年6月｜` +
+      `計算条件：${kenpoLabel}${kaigoLabel}${depLabel}｜` +
+      `参照：国税庁・厚生労働省・各都道府県公表情報｜` +
+      `※計算は目安です。生命保険料控除等の個別事情により実際と異なる場合があります。`;
+  }
+
   window._shareData = { take_home: r.take_home, gross: r.gross, rate, grossLabel };
 }
 
@@ -1009,8 +1028,8 @@ function buildActions(r, tab) {
       actions.push({
         icon:'🏦', title:'iDeCo（個人型確定拠出年金）を始める',
         badge:'blue', badgeLabel:'おすすめ',
-        desc:'個人事業主は月最大68,000円まで全額所得控除。老後資産も同時に形成できます。',
-        saving:`→ 節税効果：年間 約 ${fmtMan(saving)} 増（掛金月2.3万円・あなたの税率で概算）`,
+        desc:'個人事業主は月最大68,000円まで全額所得控除（国民年金基金等との合算）。老後資産も同時に形成できます。',
+        saving:`→ 節税効果：年間 約 ${fmtMan(saving)} 増（掛金月2.3万円で試算・あなたの税率で概算）`,
         link:{ url:'https://site1.sbisec.co.jp/ETGate/?OutSide=on&_ControlID=WPLETmgR001Control&_DataStoreID=DSWPLETmgR001Control&burl=search_ideco&cat1=ideco&cat2=none&dir=ideco&file=ideco_top.html', label:'SBI証券でiDeCoを始める' }
       });
     }
@@ -1037,7 +1056,7 @@ function buildActions(r, tab) {
     actions.push({
       icon:'🏦', title:'iDeCo（個人型確定拠出年金）を始める',
       badge:'blue', badgeLabel:'おすすめ',
-      desc:'会社員は月最大23,000円まで全額所得控除。年末調整で戻ってきます。',
+      desc:'会社員の上限は月12,000〜23,000円（企業年金の有無・種類により異なります）。年末調整で控除されます。',
       saving:`→ 節税効果：月2万円掛けた場合、年間 約 ${fmtMan(Math.floor(20000*12*marginalRate))} 増（あなたの税率で概算）`,
       link:{ url:'https://www.rakuten-sec.co.jp/ideco/', label:'楽天証券でiDeCoを始める' }
     });
