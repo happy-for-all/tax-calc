@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - main
-
-# 👑 追記：Nodeの最新アップデートによるクラッシュを回避するおまじない
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  # 👑 四国回線と同じく、手動実行ボタンも出せるように追加
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -15,20 +13,30 @@ jobs:
     name: Build & Deploy
 
     steps:
-      - name: Checkout
+      - name: リポジトリをチェックアウト
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Python 3.11 をセットアップ
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Build dist/
+      # ※tax-calcのbuild.pyは標準ライブラリのみ使用のため、pip installは省略（最速化）
+
+      - name: build.py を実行
         run: python build.py
 
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
+      # 👇 ここからが四国回線の成功実績ロジックの完全移植です 👇
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # 👑 追記：Wranglerに「デプロイして」と明示し、エラーがあれば詳細を出させる
-          command: deploy --log-level debug
+          node-version: '22'
+
+      - name: Wrangler をインストール
+        run: npm install -g wrangler
+
+      - name: Cloudflare Workers へデプロイ
+        env:
+          # 新しいリポジトリ(tax-calc)のSecretsにこれが登録されていることだけ確認してください！
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler deploy
