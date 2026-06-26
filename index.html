@@ -837,6 +837,7 @@ const taxable_jumin = Math.max(0,
     tax_total:      income_tax + residence_tax,
     total_deducted: social_total + income_tax + residence_tax,
     taxable: taxable_income,
+    taxable_jumin,
     tab: 'employee',
     pref, age, dep,
     salary, bonus,
@@ -863,7 +864,7 @@ function calcSelf(pref, age, dep) {
   const nhi_base        = Math.max(0, jigyo_shotoku - 430000);
   const nhi_income_part = Math.floor(nhi_base * nhi_ir);
   const nhi_per_part    = nhi_pc * (1 + dep);
-  const nhi_total       = Math.min(nhi_income_part + nhi_per_part, 1040000);
+  const nhi_total       = Math.min(nhi_income_part + nhi_per_part, 1130000);
 
   const nenkin = nenkin_free ? 0 : TAX_MASTER.national_pension_monthly * 12;
 
@@ -902,6 +903,7 @@ const taxable_jumin = Math.max(0,
     tax_total:       income_tax + residence_tax,
     total_deducted,
     taxable: taxable_income,
+    taxable_jumin,
     tab: 'self',
     pref, age, dep,
     revenue, nhi_ir, nhi_pc,
@@ -1050,7 +1052,7 @@ function buildActions(r, tab) {
   }
 
   // 修正：ふるさと納税の上限額計算を正確な計算式（特例控除方式）にアップグレード
-  const jumin_wari = Math.floor(r.taxable * 0.10);
+  const jumin_wari = Math.floor(r.taxable_jumin * 0.10);
   const incomeTaxRate = getMarginalRate(r.taxable);
   const furusato_limit = Math.floor(
     (jumin_wari * 0.20) / (0.90 - (incomeTaxRate * 1.021))
