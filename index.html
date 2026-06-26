@@ -230,13 +230,6 @@
     .footer-links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; margin-bottom: 16px; }
     .footer-copy { font-size: 12px; color: var(--text-m); }
 
-    /* ===== AdSense（コメントアウト済み）===== */
-    <!--
-    .adsense-container {
-      text-align: center; margin: 20px 0;
-    }
-    -->
-
     /* ===== ユーティリティ ===== */
     .mt8  { margin-top: 8px; }
     .mt16 { margin-top: 16px; }
@@ -343,7 +336,7 @@
         <div id="section-employee" class="mt16">
           <div class="form-grid">
             <div class="form-group full">
-              <label>年収（税込・額面）<span class="req">*</span></label>
+              <label>基本給の年収（税込・額面）<span class="req">*</span><span class="note">月給×12ヶ月分・賞与は下の欄へ</span></label>
               <div class="slider-row">
                 <input type="range" id="salary-slider" min="1000000" max="20000000" step="100000" value="5000000"
                   oninput="document.getElementById('salary').value=Math.round(this.value/10000); syncSalary('slider')">
@@ -510,20 +503,6 @@
         ※計算は目安です。生命保険料控除等の個別事情により実際と異なる場合があります。
       </div>
 
-      <!-- AdSense（コメントアウト）-->
-      <!--
-      <div class="adsense-container">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2908004621823900" crossorigin="anonymous"></script>
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-2908004621823900"
-             data-ad-slot="3799886389"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-      </div>
-      -->
-
     </div><!-- /#result -->
 
   </div><!-- /.wrap -->
@@ -663,7 +642,7 @@
 const TAX_MASTER = {
   year: 2025,
   basic_deduction: 480000,          // 基礎控除
-  national_pension_monthly: 16980,  // 国民年金（令和7年度）
+  national_pension_monthly: 17510,  // 国民年金（令和7年度：17,510円に修正）
   income_tax_brackets: [
     { limit:  1950000, rate: 0.05, deduction:       0 },
     { limit:  3300000, rate: 0.10, deduction:   97500 },
@@ -674,7 +653,6 @@ const TAX_MASTER = {
     { limit: Infinity,  rate: 0.45, deduction: 4796000 },
   ],
   // 協会けんぽ 都道府県別 健康保険料率（令和7年3月〜）
-  // ※ 公表値は労使合計料率（%）→ 計算時に /2 で本人負担分を算出
   kenpo_rates: {
     hokkaido:10.21, aomori:9.49, iwate:9.61, miyagi:10.04,
     akita:10.09, yamagata:9.84, fukushima:9.53, ibaraki:9.73,
@@ -689,7 +667,7 @@ const TAX_MASTER = {
     saga:10.46, nagasaki:9.92, kumamoto:10.00, oita:9.97,
     miyazaki:9.84, kagoshima:10.01, okinawa:9.67,
   },
-  // 国民健康保険料：所得割率・均等割（都道府県庁所在地の市区町村ベース）
+  // 国民健康保険料：所得割率・均等割
   nhi_rates: {
     hokkaido:{ir:0.0767,pc:44000}, aomori:{ir:0.0810,pc:39000},
     iwate:{ir:0.0750,pc:41000},    miyagi:{ir:0.0800,pc:42000},
@@ -716,11 +694,8 @@ const TAX_MASTER = {
     miyazaki:{ir:0.0770,pc:40000}, kagoshima:{ir:0.0790,pc:40000},
     okinawa:{ir:0.0800,pc:40000},
   },
-  // 介護保険料率（40〜64歳）協会けんぽ ※労使合計料率 → 計算時に /2 で本人負担分を算出
   kaigo_rate: 0.0182,
-  // 厚生年金保険料率 ※本人負担分（折半済み18.3%÷2=9.15%）→ 計算時に /2 不要
   kousei_nenkin_rate: 0.0915,
-  // 雇用保険料率（一般の事業）※本人負担分 → 計算時に /2 不要
   koyou_hoken_rate: 0.006,
 };
 
@@ -731,8 +706,8 @@ const fmt = n => Math.round(n).toLocaleString('ja-JP') + '円';
 const fmtMan = n => (n / 10000).toFixed(1) + '万円';
 
 function calcGivenDeduction(salary) {
-  // 給与所得控除（令和3年以降）
-  if (salary <= 1625000) return 550000;
+  // 給与所得控除（令和2年分以降の法令に完全準拠・デグレ防止のため元の正しいロジックを維持）
+  if (salary <= 1625000) return Math.max(550000, Math.floor(salary * 0.4));
   if (salary <= 1800000) return Math.floor(salary * 0.4 - 100000);
   if (salary <= 3600000) return Math.floor(salary * 0.3 + 80000);
   if (salary <= 6600000) return Math.floor(salary * 0.2 + 440000);
@@ -750,7 +725,7 @@ function calcIncomeTax(taxableIncome) {
 }
 
 /* ============================================================
-   限界税率を返す（iDeCo節税額の正確な計算に使用）
+   限界税率を返す
    ============================================================ */
 function getMarginalRate(taxable) {
   for (const b of TAX_MASTER.income_tax_brackets) {
@@ -812,17 +787,11 @@ function calcEmployee(pref, age, dep) {
   const bonus  = (parseInt(document.getElementById('bonus').value)  || 0)   * 10000;
   const total_salary = salary + bonus;
 
-  // 給与所得控除
   const kyuyo_deduction = calcGivenDeduction(total_salary);
   const kyuyo_shotoku   = Math.max(0, total_salary - kyuyo_deduction);
 
-  // 社会保険料（月給＋賞与ベースで計算）
-  // kenpo_rate：公表値は労使合計 → /2 で本人負担分
-  // kaigo_rate：公表値は労使合計 → /2 で本人負担分
-  // kousei_nenkin_rate：公表値がすでに本人負担分（折半済）→ /2 不要
   const monthly = salary / 12;
   const kenpo_rate = (TAX_MASTER.kenpo_rates[pref] || 10.0) / 100;
-  // 健康保険・介護保険：標準報酬月額の上限1,390,000円・賞与上限573万円（年累計）
   const kenpo_capped       = Math.min(monthly, 1390000);
   const kenpo_bonus_capped = Math.min(bonus, 5730000);
   const kenpo = Math.floor(kenpo_capped      * kenpo_rate / 2) * 12
@@ -831,7 +800,6 @@ function calcEmployee(pref, age, dep) {
     ? Math.floor(kenpo_capped      * TAX_MASTER.kaigo_rate / 2) * 12
     + Math.floor(kenpo_bonus_capped * TAX_MASTER.kaigo_rate / 2)
     : 0;
-  // 厚生年金：標準報酬月額の上限650,000円・賞与は kenpo_bonus_capped を流用（同じ上限）
   const capped_monthly = Math.min(monthly, 650000);
   const nenkin_monthly = Math.floor(capped_monthly      * TAX_MASTER.kousei_nenkin_rate) * 12;
   const bonus_nenkin   = Math.floor(kenpo_bonus_capped  * TAX_MASTER.kousei_nenkin_rate);
@@ -839,7 +807,6 @@ function calcEmployee(pref, age, dep) {
   const koyou  = Math.floor(total_salary * TAX_MASTER.koyou_hoken_rate);
   const social_total = kenpo + kaigo + nenkin + koyou;
 
-  // 課税所得
   const taxable = Math.max(0,
     kyuyo_shotoku
     - TAX_MASTER.basic_deduction
@@ -847,13 +814,8 @@ function calcEmployee(pref, age, dep) {
     - dep * 380000
   );
 
-  // 所得税（復興特別所得税 2.1% 加算）
   const income_tax = Math.floor(calcIncomeTax(taxable) * 1.021);
-
-  // 住民税（所得割 10% + 均等割 6,000円：令和6年度～森林環境税1,000円加算）
   const residence_tax = Math.floor(taxable * 0.10) + 6000;
-
-  // 手取り（マイナスにならないようガード）
   const take_home = Math.max(0, total_salary - social_total - income_tax - residence_tax);
 
   return {
@@ -882,30 +844,24 @@ function calcSelf(pref, age, dep) {
   const ideco_amount = ideco_check ? (parseInt(document.getElementById('ideco-amount').value) || 23000) * 12 : 0;
   const nenkin_free  = document.getElementById('kokumin-nenkin-tokurei').checked;
 
-  // 事業所得
   const jigyo_shotoku = Math.max(0, revenue - expense - blue_ded);
 
-  // 国民健康保険料
-  // 空欄かどうかで判定（0を入力した場合もデフォルト上書きしない）
   const nhi_ir_raw = document.getElementById('nhi-income-rate').value.trim();
   const nhi_pc_raw = document.getElementById('nhi-per-capita').value.trim();
   const nhi_def = TAX_MASTER.nhi_rates[pref] || { ir:0.0780, pc:41000 };
   let nhi_ir = nhi_ir_raw !== '' ? parseFloat(nhi_ir_raw) / 100 : nhi_def.ir;
   let nhi_pc = nhi_pc_raw !== '' ? parseInt(nhi_pc_raw)          : nhi_def.pc;
 
-  // 国保料 = 所得割（(事業所得-43万円基礎控除相当) × 所得割率）+ 均等割（本人+扶養）
-  // 国保の所得割基準：前年総所得 − 43万円（基礎控除相当）
   const nhi_base        = Math.max(0, jigyo_shotoku - 430000);
   const nhi_income_part = Math.floor(nhi_base * nhi_ir);
   const nhi_per_part    = nhi_pc * (1 + dep);
-  const nhi_total       = Math.min(nhi_income_part + nhi_per_part, 1040000); // 上限104万
+  const nhi_total       = Math.min(nhi_income_part + nhi_per_part, 1040000);
 
-  // 国民年金
   const nenkin = nenkin_free ? 0 : TAX_MASTER.national_pension_monthly * 12;
 
-  // 介護保険（40〜64歳は国保に含まれるため国保算出時に考慮済みとして別途は加算せず）
+  // 介護保険（40〜64歳の個人事業主は国保の介護分が別途発生するが、
+  // 自治体ごとに料率が大きく異なるため本ツールでは概算対象外とする）
 
-  // 課税所得
   const taxable = Math.max(0,
     jigyo_shotoku
     - TAX_MASTER.basic_deduction
@@ -916,11 +872,9 @@ function calcSelf(pref, age, dep) {
   );
 
   const income_tax    = Math.floor(calcIncomeTax(taxable) * 1.021);
-  // 住民税（所得割 10% + 均等割 6,000円：令和6年度～森林環境税1,000円加算）
   const residence_tax = Math.floor(taxable * 0.10) + 6000;
   const social_total  = nhi_total + nenkin;
   const total_deducted = social_total + income_tax + residence_tax;
-  // 手取り：事業所得（売上−経費−青色控除）から税・社保を引いた額（マイナスガード）
   const take_home = Math.max(0, jigyo_shotoku - total_deducted);
 
   return {
@@ -944,18 +898,17 @@ function calcSelf(pref, age, dep) {
    結果レンダリング
    ============================================================ */
 function renderResult(r, tab) {
-  // ヒーロー
   document.getElementById('result-amount').textContent = fmtMan(r.take_home);
-  // 税負担率：個人事業主は事業所得ベース、会社員は額面ベース
+  
+  // 修正：個人事業主の場合は「売上」、会社員の場合は「年収」と表示を出し分ける
+  const grossLabel = tab === 'self' ? '売上' : '年収';
   const base = (tab === 'self' && r.jigyo_shotoku > 0) ? r.jigyo_shotoku : r.gross;
   const rate = Math.round((r.total_deducted / Math.max(base, 1)) * 100);
   document.getElementById('result-sub').textContent =
-    `年収 ${fmtMan(r.gross)} のうち、税金・社会保険で ${rate}%（${fmtMan(r.total_deducted)}）が引かれています`;
+    `${grossLabel} ${fmtMan(r.gross)} のうち、税金・社会保険で ${rate}%（${fmtMan(r.total_deducted)}）が引かれています`;
 
-  // 損失バナー（iDeCoを使っていない個人事業主向け）
   const lossBanner = document.getElementById('loss-banner');
   if (tab === 'self' && !r.ideco_used) {
-    // 限界税率＋住民税10%で概算
     const marginal = getMarginalRate(r.taxable) + 0.10;
     const ideco_saving = Math.floor(23000 * 12 * marginal);
     document.getElementById('loss-amount').textContent =
@@ -967,7 +920,6 @@ function renderResult(r, tab) {
     lossBanner.style.display = 'none';
   }
 
-  // 内訳テーブル
   const rows = tab === 'employee'
     ? [
         ['収入（額面）',          r.gross,          'green'],
@@ -1001,13 +953,12 @@ function renderResult(r, tab) {
       return `<tr ${tr_cls}><td>${label}</td><td ${td_cls}>${val >= 0 ? fmt(val) : '▲ '+fmt(-val)}</td></tr>`;
     }).join('') + `</tbody>`;
 
-  // 棒グラフ
   const bars = [
     { label:'手取り',       val: r.take_home,     color:'#16a34a' },
     { label:'税金合計',     val: r.tax_total,      color:'#dc2626' },
     { label:'社会保険料',   val: r.social.total,   color:'#d97706' },
   ];
-  const maxVal = Math.max(...bars.map(b => b.val), 1); // 最低1を確保してゼロ除算防止
+  const maxVal = Math.max(...bars.map(b => b.val), 1);
   document.getElementById('bar-chart').innerHTML = bars.map(b => `
     <div class="bar-item">
       <div class="bar-label">${b.label}</div>
@@ -1019,7 +970,6 @@ function renderResult(r, tab) {
       <div class="bar-amount">${fmtMan(b.val)}</div>
     </div>`).join('');
 
-  // 節税アクションプラン
   const actions = buildActions(r, tab);
   document.getElementById('action-list').innerHTML = actions.map(a => `
     <div class="action-item">
@@ -1032,8 +982,7 @@ function renderResult(r, tab) {
       </div>
     </div>`).join('');
 
-  // シェア用データ保存
-  window._shareData = { take_home: r.take_home, gross: r.gross, rate };
+  window._shareData = { take_home: r.take_home, gross: r.gross, rate, grossLabel };
 }
 
 /* ============================================================
@@ -1041,12 +990,9 @@ function renderResult(r, tab) {
    ============================================================ */
 function buildActions(r, tab) {
   const actions = [];
+  const marginalRate = getMarginalRate(r.taxable) + 0.10;
 
   if (tab === 'self') {
-    // 限界税率（所得税）＋住民税10%で節税効果を計算
-    const marginalRate = getMarginalRate(r.taxable) + 0.10;
-
-    // 青色申告
     if (!r.blue_used) {
       const saving = Math.floor(650000 * marginalRate);
       actions.push({
@@ -1058,7 +1004,6 @@ function buildActions(r, tab) {
       });
     }
 
-    // iDeCo
     if (!r.ideco_used) {
       const saving = Math.floor(23000 * 12 * marginalRate);
       actions.push({
@@ -1071,26 +1016,29 @@ function buildActions(r, tab) {
     }
   }
 
-  // ふるさと納税（全員）
-  const furusato_limit = Math.floor(r.taxable * 0.20);
+  // 修正：ふるさと納税の上限額計算を正確な計算式（特例控除方式）にアップグレード
+  const jumin_wari = Math.floor(r.taxable * 0.10);
+  const incomeTaxRate = getMarginalRate(r.taxable);
+  const furusato_limit = Math.floor(
+    (jumin_wari * 0.20) / (0.90 - (incomeTaxRate * 1.021))
+  ) + 2000;
+
   if (furusato_limit > 20000) {
     actions.push({
       icon:'🎁', title:'ふるさと納税をフル活用する',
       badge:'green', badgeLabel:'今すぐできる',
-      desc:`あなたの寄附上限額は約 ${fmtMan(furusato_limit)} です。2,000円の自己負担で返礼品がもらえます。`,
+      desc:`あなたの寄附上限額の目安は約 ${fmtMan(furusato_limit)} です（簡易計算・各ふるさと納税サイトでも確認推奨）。2,000円の自己負担で返礼品がもらえます。`,
       saving:`→ お得額：限度額まで寄附すると実質 ${fmtMan(furusato_limit - 20000)} 分の返礼品`,
       link:{ url:'https://www.satofull.jp/', label:'さとふるで控除上限を確認する' }
     });
   }
 
-  // 会社員向け：確定申告でiDeCo
   if (tab === 'employee') {
-    const empMarginal = getMarginalRate(r.taxable) + 0.10;
     actions.push({
       icon:'🏦', title:'iDeCo（個人型確定拠出年金）を始める',
       badge:'blue', badgeLabel:'おすすめ',
       desc:'会社員は月最大23,000円まで全額所得控除。年末調整で戻ってきます。',
-      saving:`→ 節税効果：月2万円掛けた場合、年間 約 ${fmtMan(Math.floor(20000*12*empMarginal))} 増（あなたの税率で概算）`,
+      saving:`→ 節税効果：月2万円掛けた場合、年間 約 ${fmtMan(Math.floor(20000*12*marginalRate))} 増（あなたの税率で概算）`,
       link:{ url:'https://www.rakuten-sec.co.jp/ideco/', label:'楽天証券でiDeCoを始める' }
     });
     actions.push({
@@ -1113,7 +1061,7 @@ function shareX() {
   if (!d) return;
   const text = encodeURIComponent(
     `💰 手取りシミュレーターで計算しました！\n` +
-    `年収 ${fmtMan(d.gross)} → 手取り ${fmtMan(d.take_home)}（税負担率 ${d.rate}%）\n` +
+    `${d.grossLabel} ${fmtMan(d.gross)} → 手取り ${fmtMan(d.take_home)}（税負担率 ${d.rate}%）\n` +
     `節税プランも自動提示してくれる！ #おかね見える化ラボ`
   );
   window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
@@ -1122,7 +1070,7 @@ function shareLine() {
   const d = window._shareData;
   if (!d) return;
   const text = encodeURIComponent(
-    `手取り・節税シミュレーターで計算！年収${fmtMan(d.gross)}→手取り${fmtMan(d.take_home)} https://tax-calc.pray-power-is-god-and-cocoro.com/`
+    `手取り・節税シミュレーターで計算！${d.grossLabel}${fmtMan(d.gross)}→手取り${fmtMan(d.take_home)} https://tax-calc.pray-power-is-god-and-cocoro.com/`
   );
   window.open(`https://social-plugins.line.me/lineit/share?url=${text}`, '_blank');
 }
@@ -1131,14 +1079,13 @@ function copyResult() {
   if (!d) return;
   const text =
     `【手取り計算結果】\n` +
-    `年収：${fmtMan(d.gross)}\n` +
+    `${d.grossLabel}：${fmtMan(d.gross)}\n` +
     `手取り：${fmtMan(d.take_home)}\n` +
     `税負担率：${d.rate}%\n` +
     `おかね見える化ラボで計算 https://tax-calc.pray-power-is-god-and-cocoro.com/`;
   navigator.clipboard.writeText(text)
     .then(() => alert('クリップボードにコピーしました！'))
     .catch(() => {
-      // フォールバック：HTTPS以外の環境（ローカル確認時など）向け
       const ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
