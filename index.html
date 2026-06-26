@@ -620,7 +620,7 @@
   <div class="wrap">
     <div class="footer-disclaimer">
       <strong>【免責事項】</strong>
-      本シミュレーターは令和8年度の最新法令に基づき、極めて高い精度で計算を行っておりますが、生命保険料控除・医療費控除・障害者控除など個人固有の事情により、実際の税額・保険料と異なる場合があります。計算結果はあくまでも目安としてご活用いただき、最終的な税額・保険料については税理士・社会保険労務士または各自治体・税務署にご確認ください。本ツールの利用によって生じた損害について、当サイトは一切の責任を負いかねます。なお、本サイトはGoogle Analyticsを使用してアクセス解析を行っています。Google Analyticsはクッキーを使用しますが、個人を特定する情報は収集しません。
+      本シミュレーターは令和8年度の最新法令に基づき、極めて高い精度で計算を行っておりますが、生命保険料控除・医療費控除・障害者控除など個人固有の事情により、実際の税額・保険料と異なる場合があります。計算結果はあくまでも目安としてご活用いただき、最終的な税額・保険料については税理士・社会保険労務士または各自治体・税務署にご確認ください。本ツールの利用によって生じた損害について、当サイトは一切の責任を負いかねます。なお、本サイトはGoogle Analyticsを使用してアクセス解析を行っています。Google Analyticsはクッキーを使用しますが、個人を特定する情報は収集しません。なお、賞与の厚生年金保険料は年間上限を超える場合、実際と異なることがあります。
     </div>
     <div class="footer-copy">© 2026 おかね見える化ラボ ／ Happy for All（HFA）プロジェクト</div>
   </div>
@@ -693,7 +693,7 @@ kenpo_rates: {
   kaigo_rate: 0.0162,
   kousei_nenkin_rate: 0.0915,
   // 変更後（定数を追加・会社員の計算に反映）
-koyou_hoken_rate: 0.006,
+koyou_hoken_rate: 0.005,
 // 子ども・子育て支援金（2026年4月分給与＝5月納付分〜）労使折半・本人負担
 kodomo_shien_rate: 0.00115,  // 0.23%÷2=0.115%（本人負担分）
 };
@@ -706,7 +706,7 @@ const fmtMan = n => (n / 10000).toFixed(1) + '万円';
 
 function calcGivenDeduction(salary) {
   // 給与所得控除（令和2年分以降の法令に完全準拠・デグレ防止のため元の正しいロジックを維持）
-  if (salary <= 1625000) return Math.max(550000, Math.floor(salary * 0.4));
+  if (salary <= 1625000) return 550000;
   if (salary <= 1800000) return Math.floor(salary * 0.4 - 100000);
   if (salary <= 3600000) return Math.floor(salary * 0.3 + 80000);
   if (salary <= 6600000) return Math.floor(salary * 0.2 + 440000);
@@ -809,12 +809,18 @@ const kodomo = Math.floor(kenpo_capped * TAX_MASTER.kodomo_shien_rate) * 12
              + Math.floor(kenpo_bonus_capped * TAX_MASTER.kodomo_shien_rate);
 const social_total = kenpo + kaigo + nenkin + koyou + kodomo;
 
-  const taxable = Math.max(0,
-    kyuyo_shotoku
-    - TAX_MASTER.basic_deduction
-    - social_total
-    - dep * 380000
-  );
+  const taxable_income = Math.max(0,
+  kyuyo_shotoku
+  - TAX_MASTER.basic_deduction   // 48万円（所得税用）
+  - social_total
+  - dep * 380000                  // 所得税の扶養控除38万円
+);
+const taxable_jumin = Math.max(0,
+  kyuyo_shotoku
+  - 430000                        // 43万円（住民税基礎控除）
+  - social_total
+  - dep * 330000                  // 住民税の扶養控除33万円
+);
 
   const income_tax = Math.floor(calcIncomeTax(taxable) * 1.021);
   const residence_tax = Math.floor(taxable * 0.10) + 6000;
@@ -864,14 +870,22 @@ function calcSelf(pref, age, dep) {
   // 介護保険（40〜64歳の個人事業主は国保の介護分が別途発生するが、
   // 自治体ごとに料率が大きく異なるため本ツールでは概算対象外とする）
 
-  const taxable = Math.max(0,
-    jigyo_shotoku
-    - TAX_MASTER.basic_deduction
-    - nhi_total
-    - nenkin
-    - ideco_amount
-    - dep * 380000
-  );
+  const taxable_income = Math.max(0,
+  jigyo_shotoku
+  - TAX_MASTER.basic_deduction   // 48万円（所得税用）
+  - nhi_total
+  - nenkin
+  - ideco_amount
+  - dep * 380000                  // 所得税の扶養控除38万円
+);
+const taxable_jumin = Math.max(0,
+  jigyo_shotoku
+  - 430000                        // 43万円（住民税基礎控除）
+  - nhi_total
+  - nenkin
+  - ideco_amount
+  - dep * 330000                  // 住民税の扶養控除33万円
+);
 
   const income_tax    = Math.floor(calcIncomeTax(taxable) * 1.021);
   const residence_tax = Math.floor(taxable * 0.10) + 6000;
@@ -887,7 +901,7 @@ function calcSelf(pref, age, dep) {
     income_tax, residence_tax,
     tax_total:       income_tax + residence_tax,
     total_deducted,
-    taxable,
+    taxable: taxable_income,
     tab: 'self',
     pref, age, dep,
     revenue, nhi_ir, nhi_pc,
