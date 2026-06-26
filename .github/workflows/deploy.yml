@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+# 👑 追記：Nodeの最新アップデートによるクラッシュを回避するおまじない
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,3 +30,5 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # 👑 追記：Wranglerに「デプロイして」と明示し、エラーがあれば詳細を出させる
+          command: deploy --log-level debug
