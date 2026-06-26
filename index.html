@@ -822,8 +822,8 @@ const taxable_jumin = Math.max(0,
   - dep * 330000                  // 住民税の扶養控除33万円
 );
 
-  const income_tax = Math.floor(calcIncomeTax(taxable) * 1.021);
-  const residence_tax = Math.floor(taxable * 0.10) + 6000;
+  const income_tax = Math.floor(calcIncomeTax(taxable_income) * 1.021);
+  const residence_tax = Math.floor(taxable_jumin * 0.10) + 6000;
   const take_home = Math.max(0, total_salary - social_total - income_tax - residence_tax);
 
   return {
@@ -836,7 +836,7 @@ const taxable_jumin = Math.max(0,
     residence_tax,
     tax_total:      income_tax + residence_tax,
     total_deducted: social_total + income_tax + residence_tax,
-    taxable,
+    taxable: taxable_income,
     tab: 'employee',
     pref, age, dep,
     salary, bonus,
@@ -887,8 +887,8 @@ const taxable_jumin = Math.max(0,
   - dep * 330000                  // 住民税の扶養控除33万円
 );
 
-  const income_tax    = Math.floor(calcIncomeTax(taxable) * 1.021);
-  const residence_tax = Math.floor(taxable * 0.10) + 6000;
+  const income_tax    = Math.floor(calcIncomeTax(taxable_income) * 1.021);
+  const residence_tax = Math.floor(taxable_jumin * 0.10) + 6000;
   const social_total  = nhi_total + nenkin;
   const total_deducted = social_total + income_tax + residence_tax;
   const take_home = Math.max(0, jigyo_shotoku - total_deducted);
