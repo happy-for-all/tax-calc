@@ -6,7 +6,8 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="description" content="給与所得者・個人事業主の手取り額を無料でかんたん計算。所得税・住民税・社会保険料を正確に算出し、あなた専用の節税アクションプランを自動提示します。">
   <link rel="canonical" href="https://tax-calc.pray-power-is-god-and-cocoro.com/">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💰%3C/text%3E%3C/svg%3E">
+  <!-- 💰アイコン（エラー防止のためURLエンコード済み） -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E">
   <title>おかね見える化ラボ｜手取り・節税シミュレーター</title>
 
   <!-- Google Analytics -->
@@ -410,15 +411,19 @@
             </div>
           </div>
 
-          <div class="mt16">
+         <div class="mt16">
             <label style="display:block; margin-bottom:10px;">節税オプション（現在使っているものにチェック）</label>
             <div class="check-group">
-              <label class="check-item">
-                <input type="checkbox" id="ideco-check">
-                iDeCo加入中
+              <!-- ▼ここから修正▼ -->
+              <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                <label class="check-item" style="margin-right: 8px;">
+                  <input type="checkbox" id="ideco-check">
+                  iDeCo加入中
+                </label>
                 <input type="number" id="ideco-amount" placeholder="月額（円）" value="23000"
-                  style="max-width:140px; margin-left:8px; padding:6px 10px; font-size:13px;">
-              </label>
+                  style="max-width:140px; padding:6px 10px; font-size:13px;" aria-label="iDeCoの月額">
+              </div>
+              <!-- ▲ここまで修正▲ -->
               <label class="check-item">
                 <input type="checkbox" id="kokumin-nenkin-tokurei">
                 国民年金保険料を全額免除されている
