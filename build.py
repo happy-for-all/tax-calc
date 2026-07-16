@@ -20,7 +20,7 @@ from datetime import datetime, timezone, timedelta
 DIST_DIR   = 'dist'
 INDEX_HTML = 'index.html'
 JST        = timezone(timedelta(hours=9))
-
+OTHER_FILES_TO_COPY = ['ads.txt']
 # ============================================================
 # ユーティリティ
 # ============================================================
@@ -56,6 +56,14 @@ def build():
     dest = os.path.join(DIST_DIR, INDEX_HTML)
     shutil.copy2(INDEX_HTML, dest)
     print(f'[build] {INDEX_HTML} → {DIST_DIR}/ にコピー完了')
+  
+    # --- その他の静的ファイルを dist/ にコピー ---
+    for fname in OTHER_FILES_TO_COPY:
+        if os.path.exists(fname):
+            shutil.copy2(fname, os.path.join(DIST_DIR, fname))
+            print(f'[build] {fname} → {DIST_DIR}/ にコピー完了')
+        else:
+            print(f'[build] ⚠️ 警告: {fname} が見つからないためスキップしました')
 
     # --- MD5ハッシュ生成（CDNキャッシュ破棄用）---
     file_hash = md5_file(dest)
